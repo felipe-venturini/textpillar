@@ -13,7 +13,7 @@ claude plugin add /path/to/textpillar
 Or install from GitHub:
 
 ```bash
-claude plugin add github:felipeventurini/textpillar
+claude plugin add github:felipe-venturini/textpillar
 ```
 
 ## Quick Start
