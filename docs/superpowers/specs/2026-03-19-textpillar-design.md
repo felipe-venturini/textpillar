@@ -22,11 +22,11 @@ The plugin is designed to be:
 | Daily news blog | Last 24h | Shallow (5-10 sources) | Blog + image prompt |
 | Weekly podcast | Last 7 days | Medium (10-20 sources) | Script + thumbnail + blog |
 | Documentary content | No limit | Deep (20-50+ sources) | Blog + script + images |
-| Series (daily, Sun-Sun) | Last 24h per edition | Shallow-medium | Blog per day |
+| Series (daily, Sun-Sun) | Last 24h per edition | Shallow-medium | Blog per day (manual invocation per day in v1) |
 
 ### 1.2 Key Principles
 
-- **Source integrity** — URLs must be real articles (not homepages, not category pages), returning HTTP 200
+- **Source integrity** — URLs must be real articles (not homepages, not category pages), HTTP status warned by hook and validated by validator agent
 - **Bias mitigation** — Cross-reference facts across 2+ independent sources
 - **No repetition** — Agent memory prevents duplicate content across sessions
 - **SEO without spam** — Keyword density controlled at 1.5-2.5%
@@ -67,7 +67,7 @@ textpillar/                              (plugin root)
 | Directory | Purpose | Lifecycle |
 |---|---|---|
 | `/tmp/textpillar-${CLAUDE_SESSION_ID}/` | Intermediate session data (research, curated, validated JSONs) | Cleaned up by SessionEnd hook |
-| `./textpillar-output/` | Final outputs (blog.md, script.json, image-prompt.json) | Persists in user's working directory |
+| `./textpillar-output/` | Final outputs with date-based naming (e.g., `2026-03-19-blog.md`, `2026-03-19-script.json`) | Persists in user's working directory, no overwrites |
 | `.claude/agent-memory-local/<agent-name>/` | Agent persistent memory (anti-repetition, visual consistency) | Persists across sessions |
 
 ### 2.3 Data Flow
@@ -98,7 +98,7 @@ User
   │   ├─ Verifies URL patterns (rejects homepages, category pages)
   │   ├─ Confirms content matches extracted summaries
   │   └─ Writes /tmp/textpillar-<session>/03-validated.json
-  │   (HTTP 200 already enforced by PreToolUse hook on WebFetch)
+  │   (HTTP status warned by PreToolUse hook; validator agent makes final accept/reject decision)
   │
   ├─ Phase 4: Generation (PARALLEL subagents)
   │   ├─ @blog-writer (model: opus) → ./textpillar-output/blog.md
@@ -575,7 +575,7 @@ hooks:
 ---
 ```
 
-See full SKILL.md content in Section 2.3 Data Flow and the corrected version presented during design review.
+The full SKILL.md body content will be written during implementation based on the data flow in Section 2.3 and the behavioral rules below. No separate reference document exists — this spec is the single source of truth.
 
 **Key behaviors:**
 - Runs in main conversation context (no `context: fork`) to support interactive questions
