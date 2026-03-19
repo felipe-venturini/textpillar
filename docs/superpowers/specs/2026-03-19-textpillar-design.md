@@ -66,7 +66,7 @@ textpillar/                              (plugin root)
 
 | Directory | Purpose | Lifecycle |
 |---|---|---|
-| `/tmp/textpillar-${CLAUDE_SESSION_ID}/` | Intermediate session data (research, curated, validated JSONs) | Cleaned up by SessionEnd hook |
+| `.textpillar-session/` | Intermediate session data (research, curated, validated JSONs) | Cleaned up by SessionEnd hook; gitignored |
 | `./textpillar-output/` | Final outputs with date-based naming (e.g., `2026-03-19-blog.md`, `2026-03-19-script.json`) | Persists in user's working directory, no overwrites |
 | `.claude/agent-memory-local/<agent-name>/` | Agent persistent memory (anti-repetition, visual consistency) | Persists across sessions |
 
@@ -82,28 +82,28 @@ User
   │   ├─ JSON provided? → extract params, proceed
   │   └─ Missing params? → adaptive questions, one at a time
   │
-  ├─ Phase 1: @researcher (subagent, model: haiku)
+  ├─ Phase 1: researcher agent (subagent, model: haiku)
   │   ├─ WebSearch (parallel queries, reformulated)
   │   ├─ WebFetch (user-provided URLs, RSS, APIs)
-  │   └─ Writes /tmp/textpillar-<session>/01-research.json
+  │   └─ Writes .textpillar-session/01-research.json
   │
-  ├─ Phase 2: @curator (subagent, model: sonnet)
+  ├─ Phase 2: curator agent (subagent, model: sonnet)
   │   ├─ Reads 01-research.json
   │   ├─ Checks agent memory for past content
   │   ├─ Cross-references, deduplicates, ranks by credibility
-  │   └─ Writes /tmp/textpillar-<session>/02-curated.json
+  │   └─ Writes .textpillar-session/02-curated.json
   │
-  ├─ Phase 3: @validator (subagent, model: haiku)
+  ├─ Phase 3: validator agent (subagent, model: haiku)
   │   ├─ Reads 02-curated.json
   │   ├─ Verifies URL patterns (rejects homepages, category pages)
   │   ├─ Confirms content matches extracted summaries
-  │   └─ Writes /tmp/textpillar-<session>/03-validated.json
+  │   └─ Writes .textpillar-session/03-validated.json
   │   (HTTP status warned by PreToolUse hook; validator agent makes final accept/reject decision)
   │
   ├─ Phase 4: Generation (PARALLEL subagents)
-  │   ├─ @blog-writer (model: opus) → ./textpillar-output/blog.md
-  │   ├─ @script-writer (model: opus) → ./textpillar-output/script.json
-  │   └─ @image-prompt-writer (model: sonnet) → ./textpillar-output/image-prompt.json
+  │   ├─ blog-writer agent (model: opus) → ./textpillar-output/<date>-blog.md
+  │   ├─ script-writer agent (model: opus) → ./textpillar-output/<date>-script.json
+  │   └─ image-prompt-writer agent (model: sonnet) → ./textpillar-output/<date>-image-prompt.json
   │
   └─ Phase 5: Present results summary to user
 ```
@@ -568,19 +568,21 @@ argument-hint: [topic or JSON config]
 hooks:
   SessionStart:
     - type: command
-      command: "mkdir -p ./textpillar-output"
+      command: "mkdir -p ./textpillar-output && mkdir -p .textpillar-session"
   SessionEnd:
     - type: command
-      command: "rm -rf /tmp/textpillar-${CLAUDE_SESSION_ID}"
+      command: "rm -rf .textpillar-session"
 ---
 ```
 
 The full SKILL.md body content will be written during implementation based on the data flow in Section 2.3 and the behavioral rules below. No separate reference document exists — this spec is the single source of truth.
 
+**Agent invocation:** The orchestrator describes what needs to be done in each phase. Claude automatically delegates to the correct agent based on the agent's `description` field matching the task. No special syntax is needed — Claude reads agent descriptions and decides which to invoke.
+
 **Key behaviors:**
 - Runs in main conversation context (no `context: fork`) to support interactive questions
-- Uses `@agent-name` syntax to invoke specific plugin agents
-- Writes intermediate data to `/tmp/textpillar-${CLAUDE_SESSION_ID}/`
+- Describes tasks naturally; Claude matches to agents via description field
+- Writes intermediate data to `.textpillar-session/` (project-local, gitignored)
 - Writes final outputs to `./textpillar-output/`
 - Presents summary with file paths and stats at completion
 
@@ -599,7 +601,7 @@ The full SKILL.md body content will be written during implementation based on th
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); URL=$(echo \"$INPUT\" | grep -o '\"url\"[[:space:]]*:[[:space:]]*\"[^\"]*\"' | head -1 | sed 's/.*\"url\"[[:space:]]*:[[:space:]]*\"//;s/\"$//'); if [ -n \"$URL\" ]; then STATUS=$(curl -sI -o /dev/null -w '%{http_code}' --max-time 5 \"$URL\"); if [ \"$STATUS\" != \"200\" ] && [ \"$STATUS\" != \"301\" ] && [ \"$STATUS\" != \"302\" ]; then echo \"WARNING: URL $URL returned HTTP $STATUS\" >&2; fi; fi; exit 0"
+            "command": "URL=$(jq -r '.tool_input.url // empty'); if [ -n \"$URL\" ]; then STATUS=$(curl -sI -o /dev/null -w '%{http_code}' --max-time 5 \"$URL\"); if [ \"$STATUS\" -lt 200 ] || [ \"$STATUS\" -ge 400 ]; then echo \"WARNING: URL $URL returned HTTP $STATUS\" >&2; fi; fi; exit 0"
           }
         ]
       }
