@@ -612,8 +612,8 @@ The full SKILL.md body content will be written during implementation based on th
 
 ### 7.2 Skill-scoped hooks (in SKILL.md frontmatter)
 
-- `SessionStart`: Creates `./textpillar-output/` directory
-- `SessionEnd`: Cleans up `/tmp/textpillar-${CLAUDE_SESSION_ID}/`
+- `SessionStart`: Creates `./textpillar-output/` and `.textpillar-session/` directories
+- `SessionEnd`: Cleans up `.textpillar-session/`
 
 ---
 

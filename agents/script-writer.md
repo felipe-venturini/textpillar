@@ -71,6 +71,26 @@ Structure the output following the Gemini TTS API format:
 - Text format: monologue without speaker prefixes
 - Use voiceConfig instead of multiSpeakerVoiceConfig
 
+### Available Gemini TTS Voices
+
+| Voice | Personality | Voice | Personality |
+|---|---|---|---|
+| Zephyr | Bright | Aoede | Breezy |
+| Puck | Upbeat | Callirrhoe | Easy-going |
+| Charon | Informative | Umbriel | Easy-going |
+| Kore | Firm | Algieba | Smooth |
+| Fenrir | Excitable | Despina | Smooth |
+| Leda | Youthful | Erinome | Clear |
+| Orus | Firm | Algenib | Gravelly |
+| Autonoe | Bright | Rasalgethi | Informative |
+| Enceladus | Breathy | Laomedeia | Upbeat |
+| Iapetus | Clear | Achernar | Soft |
+| Alnilam | Firm | Schedar | Even |
+| Gacrux | Mature | Pulcherrima | Forward |
+| Achird | Friendly | Zubenelgenubi | Casual |
+| Vindemiatrix | Gentle | Sadachbia | Lively |
+| Sadaltager | Knowledgeable | Sulafat | Warm |
+
 ### 6. Save to memory
 After writing the script, save an episode summary to your memory:
 - Episode title
