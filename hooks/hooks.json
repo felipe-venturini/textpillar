@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "URL=$(jq -r '.tool_input.url // empty'); if [ -n \"$URL\" ]; then STATUS=$(curl -sI -o /dev/null -w '%{http_code}' --max-time 5 \"$URL\"); if [ \"$STATUS\" -lt 200 ] || [ \"$STATUS\" -ge 400 ]; then echo \"WARNING: URL $URL returned HTTP $STATUS\" >&2; fi; fi; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
