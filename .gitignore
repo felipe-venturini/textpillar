@@ -1,0 +1,11 @@
+# Textpillar session data (intermediate files)
+.textpillar-session/
+
+# Output directory (user-generated content)
+textpillar-output/
+
+# Agent memory (local, not version controlled)
+.claude/agent-memory-local/
+
+# OS files
+.DS_Store

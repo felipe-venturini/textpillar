@@ -1,0 +1,8 @@
+{
+  "name": "textpillar",
+  "description": "Multi-agent research-driven content generation. Produces SEO-optimized blog posts, Gemini TTS-ready podcast scripts, and image generation prompts from curated web research.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Felipe Venturini"
+  }
+}
