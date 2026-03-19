@@ -6,15 +6,20 @@ Textpillar researches, curates, validates web sources, and generates SEO-optimiz
 
 ## Installation
 
-```bash
-claude plugin add /path/to/textpillar
+Inside a Claude Code session, add the marketplace and install the plugin:
+
+```
+/plugin marketplace add felipe-venturini/textpillar
+/plugin install textpillar@textpillar
 ```
 
-Or install from GitHub:
+Or use the interactive plugin browser:
 
-```bash
-claude plugin add github:felipe-venturini/textpillar
 ```
+/plugin
+```
+
+Then navigate to **Marketplaces** tab → add `felipe-venturini/textpillar` → **Discover** tab → install Textpillar.
 
 ## Quick Start
 

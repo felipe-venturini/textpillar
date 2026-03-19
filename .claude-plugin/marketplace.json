@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "textpillar",
+  "owner": {
+    "name": "Felipe Venturini"
+  },
+  "plugins": [
+    {
+      "name": "textpillar",
+      "description": "Multi-agent research-driven content generation. Produces SEO-optimized blog posts, Gemini TTS-ready podcast scripts, and image generation prompts from curated web research.",
+      "source": "./",
+      "version": "1.0.0",
+      "category": "development"
+    }
+  ]
+}
